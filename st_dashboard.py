@@ -3,7 +3,7 @@
 import streamlit as st
 from clustering import perform_clustering_on_reduced
 from data_fetcher import fetch_data
-from portfolio_optimization import portfolio_optimization, plot_efficient_frontier
+from portfolio_optimization import portfolio_optimization, create_plotly_efficient_frontier
 from visualization import plot_clusters_with_hover_labels
 from preprocessing import calculate_returns
 
@@ -21,7 +21,6 @@ def create_streamlit_dashboard(company_desc_df, umap_embeddings):
     company_desc_df['Cluster'] = clusters
 
     # Plot Clusters with Hover Labels
-    st.subheader("Thematic Clusters")
     plot_clusters_with_hover_labels(umap_embeddings, clusters, company_desc_df)
 
     # Select a cluster for portfolio optimization
@@ -36,9 +35,8 @@ def create_streamlit_dashboard(company_desc_df, umap_embeddings):
     returns, avg_returns, volatility = calculate_returns(price_data)
 
     # Portfolio Optimization
-    results = portfolio_optimization(avg_returns, returns)
+    results, portfolio_weights = portfolio_optimization(avg_returns, returns)
 
     # Plot Efficient Frontier
-    st.subheader("Efficient Frontier of Selected Cluster Portfolio")
-    eff_frontier_plot = plot_efficient_frontier(results, avg_returns, volatility)
-    st.pyplot(eff_frontier_plot)
+    eff_frontier_plot = create_plotly_efficient_frontier(results, avg_returns, portfolio_weights)
+    st.plotly_chart(eff_frontier_plot)
